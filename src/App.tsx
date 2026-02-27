@@ -147,6 +147,20 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (gameState === GameState.GAME_OVER && (e.key === 'Enter' || e.key === ' ')) {
+        handleRestart();
+      }
+      if (gameState === GameState.START_MENU && (e.key === 'Enter' || e.key === ' ')) {
+        handleStart();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, saveData]);
+
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 font-sans">
       <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border-8 border-slate-800" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}>
@@ -313,11 +327,11 @@ export default function App() {
               <div className="grid grid-cols-2 gap-8 mb-12 text-left bg-white/10 p-6 rounded-3xl">
                 <div>
                   <h3 className="font-bold mb-2 text-indigo-200 uppercase text-xs tracking-widest">Movement</h3>
-                  <p className="font-bold">WASD Keys</p>
+                  <p className="font-bold">WASD / Arrow Keys</p>
                 </div>
                 <div>
                   <h3 className="font-bold mb-2 text-indigo-200 uppercase text-xs tracking-widest">Actions</h3>
-                  <p className="font-bold">J: Attack / K: Heavy / L: Skill / SPACE: Dash</p>
+                  <p className="font-bold text-xs">J/Z: Attack | K/X: Heavy | L/C: Skill | SPACE: Dash</p>
                 </div>
               </div>
 
@@ -326,7 +340,7 @@ export default function App() {
                 className="group relative bg-white text-indigo-600 font-black text-2xl px-12 py-4 rounded-full shadow-2xl hover:scale-105 transition-transform active:scale-95"
               >
                 <span className="flex items-center gap-3">
-                  <Play fill="currentColor" /> START GAME
+                  <Play fill="currentColor" /> {saveData.level > 1 ? 'CONTINUE' : 'START GAME'}
                 </span>
               </button>
             </motion.div>

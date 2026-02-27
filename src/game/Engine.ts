@@ -124,9 +124,9 @@ export class Engine {
     }
 
     // Attacks
-    if (this.input.wasJustPressed('j')) this.handleAttack('normal');
-    if (this.input.wasJustPressed('k')) this.handleAttack('heavy');
-    if (this.input.wasJustPressed('l')) {
+    if (this.input.wasJustPressed('j') || this.input.wasJustPressed('z')) this.handleAttack('normal');
+    if (this.input.wasJustPressed('k') || this.input.wasJustPressed('x')) this.handleAttack('heavy');
+    if (this.input.wasJustPressed('l') || this.input.wasJustPressed('c')) {
       if (this.player.useSkill()) {
         this.handleAttack('skill');
       }
@@ -178,7 +178,7 @@ export class Engine {
         this.souls.push(new SoulPickup(enemy.x, enemy.y));
 
         // Random weapon drop
-        if (Math.random() < 0.1) {
+        if (Math.random() < 0.15) {
           this.pickups.push(new WeaponPickup(enemy.x, enemy.y, WeaponFactory.getRandom()));
         }
         

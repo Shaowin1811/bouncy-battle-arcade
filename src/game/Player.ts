@@ -34,10 +34,10 @@ export class Player extends Entity {
     let dx = 0;
     let dy = 0;
 
-    if (input.isDown('w')) dy -= 1;
-    if (input.isDown('s')) dy += 1;
-    if (input.isDown('a')) dx -= 1;
-    if (input.isDown('d')) dx += 1;
+    if (input.isDown('w') || input.isDown('arrowup')) dy -= 1;
+    if (input.isDown('s') || input.isDown('arrowdown')) dy += 1;
+    if (input.isDown('a') || input.isDown('arrowleft')) dx -= 1;
+    if (input.isDown('d') || input.isDown('arrowright')) dx += 1;
 
     if (dx !== 0 || dy !== 0) {
       const length = Math.sqrt(dx * dx + dy * dy);

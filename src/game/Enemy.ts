@@ -21,7 +21,6 @@ export class Enemy extends Entity {
 
     if (!Enemy.sprite) {
       Enemy.sprite = new Image();
-      // Using a clearer face image
       Enemy.sprite.src = 'https://tet-dit.vercel.app/assets/face.png';
     }
   }

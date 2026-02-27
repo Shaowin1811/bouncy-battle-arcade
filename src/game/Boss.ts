@@ -28,7 +28,7 @@ export class Boss extends Entity {
 
     if (!Boss.sprite) {
       Boss.sprite = new Image();
-      Boss.sprite.src = 'https://i.pravatar.cc/150?u=boss_face';
+      Boss.sprite.src = 'https://tet-dit.vercel.app/assets/face.png';
     }
   }
 
