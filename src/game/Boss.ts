@@ -12,18 +12,24 @@ export class Boss extends Entity {
   isDashing: boolean = false;
   dashTargetX: number = 0;
   dashTargetY: number = 0;
+  private static sprite: HTMLImageElement | null = null;
 
   constructor(x: number, y: number, level: number) {
     super(
       x, 
       y, 
-      40, 
+      60, // Larger radius
       COLORS.BOSS, 
       200 + level * 150, 
       40 + level * 20
     );
-    this.damage = 15 + level * 5;
+    this.damage = 10 + level * 5; // Reduced damage
     this.goldValue = 200 + level * 100;
+
+    if (!Boss.sprite) {
+      Boss.sprite = new Image();
+      Boss.sprite.src = 'https://i.pravatar.cc/150?u=boss_face';
+    }
   }
 
   update(deltaTime: number, player: Player, spawnMinion: (x: number, y: number) => void) {
@@ -95,26 +101,41 @@ export class Boss extends Entity {
     }
 
     // Body
-    ctx.beginPath();
-    ctx.arc(0, 0, this.radius + pulse / 2, 0, Math.PI * 2);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 4;
-    ctx.stroke();
+    if (Boss.sprite && Boss.sprite.complete) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius + pulse / 2, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(Boss.sprite, -this.radius, -this.radius, this.radius * 2, this.radius * 2);
+      ctx.restore();
+      
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius + pulse / 2, 0, Math.PI * 2);
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius + pulse / 2, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 4;
+      ctx.stroke();
 
-    // Eyes
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(-15, -10, 10, 0, Math.PI * 2);
-    ctx.arc(15, -10, 10, 0, Math.PI * 2);
-    ctx.fill();
+      // Eyes
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(-15, -10, 10, 0, Math.PI * 2);
+      ctx.arc(15, -10, 10, 0, Math.PI * 2);
+      ctx.fill();
 
-    ctx.fillStyle = this.phase2 ? '#ff0000' : '#000';
-    ctx.beginPath();
-    ctx.arc(-15, -10, 5, 0, Math.PI * 2);
-    ctx.arc(15, -10, 5, 0, Math.PI * 2);
-    ctx.fill();
+      ctx.fillStyle = this.phase2 ? '#ff0000' : '#000';
+      ctx.beginPath();
+      ctx.arc(-15, -10, 5, 0, Math.PI * 2);
+      ctx.arc(15, -10, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     // Crown
     ctx.fillStyle = '#fbbf24';

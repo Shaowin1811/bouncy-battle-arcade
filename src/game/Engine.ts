@@ -107,6 +107,22 @@ export class Engine {
     // Zone Logic
     this.updateZone(deltaTime);
 
+    // Projectiles
+    for (let i = this.projectiles.length - 1; i >= 0; i--) {
+      const p = this.projectiles[i];
+      p.update(deltaTime);
+      
+      const dist = Math.sqrt((p.x - this.player.x)**2 + (p.y - this.player.y)**2);
+      if (dist < p.radius + this.player.radius) {
+        this.player.takeDamage(p.damage);
+        p.isDead = true;
+      }
+
+      if (p.isDead) {
+        this.projectiles.splice(i, 1);
+      }
+    }
+
     // Attacks
     if (this.input.wasJustPressed('j')) this.handleAttack('normal');
     if (this.input.wasJustPressed('k')) this.handleAttack('heavy');
@@ -145,7 +161,7 @@ export class Engine {
       enemy.update(deltaTime, this.player);
       
       if (enemy.getDistance(this.player) < enemy.radius + this.player.radius) {
-        this.player.takeDamage(enemy.damage * deltaTime * 10);
+        this.player.takeDamage(enemy.damage);
         if (this.player.isDead) {
           this.state = GameState.GAME_OVER;
           this.onStateChange(this.state);
@@ -175,7 +191,7 @@ export class Engine {
       this.boss.update(deltaTime, this.player, (x, y) => this.enemies.push(new Enemy(x, y, this.levelManager.currentLevel)));
       
       if (this.boss.getDistance(this.player) < this.boss.radius + this.player.radius) {
-        this.player.takeDamage(this.boss.damage * deltaTime * 5);
+        this.player.takeDamage(this.boss.damage);
       }
 
       if (this.boss.isDead) {
@@ -248,8 +264,8 @@ export class Engine {
     const dist = Math.sqrt(dx * dx + dy * dy);
 
     if (dist > this.zoneRadius) {
-      // Outside zone - take damage
-      this.player.takeDamage(5 * deltaTime);
+      // Outside zone - take damage, but don't trigger i-frames
+      this.player.takeDamage(5 * deltaTime, true);
       if (Math.random() < 0.1) {
         this.particles.spawn(this.player.x, this.player.y, '#ef4444', 2);
       }
@@ -377,6 +393,7 @@ export class Engine {
 
     for (const p of this.pickups) p.draw(this.ctx);
     for (const s of this.souls) s.draw(this.ctx);
+    for (const p of this.projectiles) p.draw(this.ctx);
     for (const e of this.enemies) e.draw(this.ctx);
     if (this.boss) this.boss.draw(this.ctx);
     this.player.draw(this.ctx);

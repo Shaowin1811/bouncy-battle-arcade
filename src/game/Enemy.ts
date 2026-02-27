@@ -5,18 +5,25 @@ import { Player } from './Player';
 export class Enemy extends Entity {
   damage: number = 5;
   goldValue: number = 10;
+  private static sprite: HTMLImageElement | null = null;
 
   constructor(x: number, y: number, level: number) {
     super(
       x, 
       y, 
-      15, 
+      25, // Increased radius for image
       COLORS.ENEMY, 
       20 + level * 10, 
       50 + level * 10
     );
-    this.damage = 5 + level * 2;
+    this.damage = 5 + level * 2; // Reduced damage
     this.goldValue = 10 + level * 5;
+
+    if (!Enemy.sprite) {
+      Enemy.sprite = new Image();
+      // Using a clearer face image
+      Enemy.sprite.src = 'src\public\YchiTQ.png';
+    }
   }
 
   update(deltaTime: number, player: Player) {
@@ -37,28 +44,43 @@ export class Enemy extends Entity {
     ctx.save();
     ctx.translate(this.x, this.y + wobble);
 
-    // Body
-    ctx.beginPath();
-    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.closePath();
+    if (Enemy.sprite && Enemy.sprite.complete) {
+      // Draw the image
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(Enemy.sprite, -this.radius, -this.radius, this.radius * 2, this.radius * 2);
+      
+      // Border
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    } else {
+      // Fallback to circle
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.closePath();
 
-    // Angry eyes
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(-4, -2, 4, 0, Math.PI * 2);
-    ctx.arc(4, -2, 4, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.arc(-4, -2, 2, 0, Math.PI * 2);
-    ctx.arc(4, -2, 2, 0, Math.PI * 2);
-    ctx.fill();
+      // Angry eyes
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(-4, -2, 4, 0, Math.PI * 2);
+      ctx.arc(4, -2, 4, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(-4, -2, 2, 0, Math.PI * 2);
+      ctx.arc(4, -2, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     ctx.restore();
 

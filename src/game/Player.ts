@@ -23,9 +23,10 @@ export class Player extends Entity {
   maxDashCooldown: number = 2000; // 2 seconds
   isDashing: boolean = false;
   dashTimer: number = 0;
+  invincibleTimer: number = 0;
   
   constructor(x: number, y: number) {
-    super(x, y, 20, COLORS.PLAYER, 100, 200);
+    super(x, y, 20, COLORS.PLAYER, 300, 200);
     this.weapon = WeaponFactory.create(WEAPONS.FISTS);
   }
 
@@ -63,6 +64,10 @@ export class Player extends Entity {
       if (this.dashTimer <= 0) {
         this.isDashing = false;
       }
+    }
+
+    if (this.invincibleTimer > 0) {
+      this.invincibleTimer -= deltaTime * 1000;
     }
   }
 
@@ -117,6 +122,11 @@ export class Player extends Entity {
 
     ctx.scale(1 + squash, 1 - squash);
 
+    // Flash if invincible
+    if (this.invincibleTimer > 0) {
+      ctx.globalAlpha = Math.sin(Date.now() / 50) * 0.3 + 0.5;
+    }
+
     // Body
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
@@ -158,6 +168,15 @@ export class Player extends Entity {
       ctx.fillRect(this.x - barWidth / 2, this.y - this.radius - 25, barWidth, barHeight);
       ctx.fillStyle = '#22c55e';
       ctx.fillRect(this.x - barWidth / 2, this.y - this.radius - 25, barWidth * (this.hp / this.maxHp), barHeight);
+    }
+  }
+
+  takeDamage(amount: number, ignoreInvincibility: boolean = false) {
+    if (!ignoreInvincibility && this.invincibleTimer > 0) return;
+    
+    super.takeDamage(amount);
+    if (!ignoreInvincibility) {
+      this.invincibleTimer = 2000; // 2 seconds of i-frames
     }
   }
 
